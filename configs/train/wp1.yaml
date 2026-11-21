@@ -1,0 +1,22 @@
+epochs: 40
+batch_size: 256
+lr: 1.0e-3
+weight_decay: 1.0e-4
+grad_clip: 5.0
+patience: 8
+min_delta: 1.0e-4
+beta_kl: 1.0e-3          # information-bottleneck weight (per-sample KL, nats)
+lambda_rate: 1.0e-3      # rate weight (per-sample bits)
+class_weights: balanced  # fitted on the training split only
+channel:
+  fragment_bytes: 16     # erasure unit of the payload stream (sensitivity: 8, 32)
+  rr_bytes: ${rr.bytes}
+  train_snr_db: [0.0, 20.0]
+  clean_fraction: 0.3    # share of samples trained without latent noise
+  train_loss_max: 0.4
+augment:                 # training-only, shared by every method
+  enabled: false
+  scale: 0.2             # amplitude factor in [1-scale, 1+scale]
+  wander: 0.3            # baseline-wander amplitude (z-score units), 0.1-1 cycles per window
+  noise: 0.05            # additive Gaussian noise std
+  shift: 5               # circular shift, samples

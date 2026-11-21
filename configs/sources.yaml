@@ -1,0 +1,38 @@
+# External documents behind configs/constants.yaml (brief rule 5). The fetch-sources workflow
+# downloads each URL on a GitHub runner, records its SHA256, extracts the text of the listed
+# pages (pdftotext -layout) and pushes text + hashes to branch r/sources. PDFs are not committed.
+sources:
+  nrf52840_ps:
+    title: nRF52840 Product Specification (Nordic Semiconductor)
+    urls:
+      - https://infocenter.nordicsemi.com/pdf/nRF52840_PS_v1.8.pdf
+      - https://cdn.sparkfun.com/assets/d/2/6/2/6/nRF52840_PS_v1.1.pdf
+    grep: ["I_CPU", "CoreMark", "I_TX", "I_RX", "DCDC", "Current consumption"]
+  fujii_aranha_curve25519:
+    title: Fujii and Aranha, Curve25519 for the Cortex-M4 and beyond (LATINCRYPT 2017; DOI to verify)
+    urls:
+      - https://www.lasca.ic.unicamp.br/media/publications/paper39.pdf
+    grep: ["X25519", "Table 2", "Teensy", "cycles"]
+  schwabe_stoffelen_aes:
+    title: Schwabe and Stoffelen, All the AES you need on Cortex-M3 and M4 (SAC 2016; IACR ePrint 2016/714)
+    urls:
+      - https://eprint.iacr.org/2016/714.pdf
+    grep: ["cycles/byte", "cycles per byte", "CTR", "M4", "GCM", "GHASH"]
+  bearssl_constanttime:
+    title: T. Pornin, BearSSL - Constant-Time Crypto (bearssl.org/constanttime.html), GHASH section
+    kind: html
+    urls:
+      - https://www.bearssl.org/constanttime.html
+    grep: ["GHASH", "cycles", "Cortex", "ctmul"]
+  oryx_stm32l4plus:
+    title: Oryx Embedded, Crypto Benchmark on STM32L4+ MCU (CycloneCRYPTO)
+    kind: html
+    urls:
+      - https://oryx-embedded.com/benchmark/st/crypto-stm32l4-plus.html
+    grep: ["SHA-256", "GCM", "MHz", "MB/s", "AES"]
+  oryx_stm32f4:
+    title: Oryx Embedded, Crypto Benchmark on STM32F4 MCU (CycloneCRYPTO)
+    kind: html
+    urls:
+      - https://oryx-embedded.com/benchmark/st/crypto-stm32f4.html
+    grep: ["SHA-256", "GCM", "MHz", "MB/s", "AES"]

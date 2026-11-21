@@ -1,0 +1,74 @@
+{
+ "pqlite.pv": [
+  [
+   "not attacker_p1(secretC[])",
+   "true"
+  ],
+  [
+   "not attacker_p1(secretH[])",
+   "true"
+  ],
+  [
+   "inj-event(NodeAccept",
+   "true"
+  ],
+  [
+   "inj-event(GwAccept",
+   "true"
+  ],
+  [
+   "event(GwAccept(nN,nG,CLASSICAL,k))",
+   "true"
+  ],
+  [
+   "event(NodeAccept(nN,nG,HYBRID,k))",
+   "true"
+  ]
+ ],
+ "pqlite_quantum.pv": [
+  [
+   "not attacker_p1(secretC[])",
+   "false"
+  ],
+  [
+   "not attacker_p1(secretH[])",
+   "true"
+  ],
+  [
+   "inj-event(NodeAccept",
+   "true"
+  ],
+  [
+   "inj-event(GwAccept",
+   "true"
+  ],
+  [
+   "event(GwAccept(nN,nG,CLASSICAL,k))",
+   "true"
+  ],
+  [
+   "event(NodeAccept(nN,nG,HYBRID,k))",
+   "true"
+  ]
+ ],
+ "pqlite_pcs_passive.pv": [
+  [
+   "not attacker_p2(secret1[])",
+   "true"
+  ],
+  [
+   "not attacker_p2(secret2[])",
+   "true"
+  ]
+ ],
+ "pqlite_pcs_active.pv": [
+  [
+   "not attacker_p2(secret1[])",
+   "true"
+  ],
+  [
+   "not attacker_p2(secret2[])",
+   "false"
+  ]
+ ]
+}

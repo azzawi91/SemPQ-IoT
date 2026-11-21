@@ -1,0 +1,19 @@
+# Validation-only development variants (decision 2026-10-11). DS2 is never loaded.
+# Round 3 (4-fold patient CV over DS1, 15 fixed epochs): ablations of the round-2 winner and
+# every baseline given the same causal features (template + long RR). For the waveform
+# baselines the template is formed at the gateway from the clean input (optimistic for them);
+# training augmentation is offered to the baselines too, and the better setting is kept.
+round: 3
+seeds: [100, 101]
+common: [dev.cv_folds=4, dev.cv_epochs=15, features.template_alpha=0.05, features.rr_long_window=100]
+variants:
+  P_full:          {method: semantic, overrides: [train.augment.enabled=true, model.recon_weight=0.3]}
+  P_no_aug:        {method: semantic, overrides: [model.recon_weight=0.3]}
+  P_no_rec:        {method: semantic, overrides: [train.augment.enabled=true]}
+  P_plain:         {method: semantic, overrides: []}
+  dwt_tpl:         {method: dwt, overrides: []}
+  dwt_aug_tpl:     {method: dwt, overrides: [train.augment.enabled=true]}
+  jscc_tpl:        {method: jscc, overrides: []}
+  jscc_aug_tpl:    {method: jscc, overrides: [train.augment.enabled=true]}
+  raw_tpl:         {method: raw, overrides: []}
+  label_aug_tpl:   {method: label, overrides: [train.augment.enabled=true]}

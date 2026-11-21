@@ -1,0 +1,16 @@
+name: mitbih
+version: 1.0.0
+root: ${paths.raw}/mitdb-1.0.0
+fs: 360
+lead: MLII
+window:
+  pre: 90                  # samples before R (0.25 s)
+  post: 162                # samples after R (0.45 s); window = 252 samples = 0.7 s
+include_q: false           # decision 2026-10-11: N/S/V/F only (docs/DECISIONS.md)
+exclude_test_records: []   # sensitivity run: [202] (same subject as DS1 record 201)
+normalise: zscore_per_beat # no dataset-level statistics
+val_rule:                  # deterministic patient-level validation subset of DS1
+  method: closest_class_fraction
+  target: 0.2
+  sizes: [3, 4, 5, 6]
+  classes: [N, S, V, F]

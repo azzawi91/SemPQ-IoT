@@ -1,0 +1,129 @@
+(* PQ-Lite handshake and first record: symbolic model for ProVerif.
+   Mirrors src/l2_pqlite/protocol.py (tiers 0 = classical, 1 = hybrid; tier 2 uses the tier-1
+   handshake). Unbounded sessions of a node N (both tiers) and of a gateway G whose floor
+   permits both tiers (worst case for downgrade).
+   Long-term secrets: PSK shared by N and G; G's ML-DSA-44 signing key. N trusts pk(skG)
+   (certificate verified once and cached, abstracted as a pre-installed public key).
+   Primitives: X25519 as Diffie-Hellman, ML-KEM-512 as an IND-CCA KEM, ML-DSA-44 as an
+   EUF-CMA signature, HKDF/HMAC as random functions, AES-GCM as an AEAD with associated data.
+   Phase 1 = compromise of the long-term secrets (PSK and gateway signing key) after the
+   sessions of phase 0 (forward secrecy). *)
+
+free c: channel.
+
+type G.
+type exponent.
+type kemsk.
+type kempkey.
+type kseed.
+type skey.
+type spkey.
+type key.
+type tier.
+
+const CLASSICAL: tier [data].
+const HYBRID: tier [data].
+const g: G [data].
+const nokem: key [data].
+const noek: kempkey [data].
+const noct: bitstring [data].
+const nosig: bitstring [data].
+const NID: bitstring [data].
+const L_CONFN, L_CONFG, L_UP, L_DOWN, L_ROOT: bitstring [data].
+
+(* Diffie-Hellman *)
+fun exp(G, exponent): G.
+equation forall x: exponent, y: exponent; exp(exp(g, x), y) = exp(exp(g, y), x).
+
+(* KEM *)
+fun kempk(kemsk): kempkey.
+fun kemct(kempkey, kseed): bitstring.
+fun kemss(kempkey, kseed): key.
+reduc forall sk: kemsk, r: kseed; kemdec(sk, kemct(kempk(sk), r)) = kemss(kempk(sk), r).
+
+(* Signature *)
+fun spk(skey): spkey.
+fun sign(bitstring, skey): bitstring.
+reduc forall m: bitstring, k: skey; verify(sign(m, k), m, spk(k)) = true.
+
+(* Hash, KDF, MAC, ratchet, AEAD *)
+fun H(bitstring): bitstring.
+fun kdf(G, key, key, bitstring, bitstring): key.     (* dh, kem, psk, transcript hash, label *)
+fun mac(key, bitstring): bitstring.
+fun mk(key): key.                                       (* message key from chain key *)
+fun aenc(key, bitstring, bitstring): bitstring.
+reduc forall k: key, m: bitstring, ad: bitstring; adec(k, aenc(k, m, ad), ad) = m.
+
+free psk: key [private].
+free skG: skey [private].
+free secretH: bitstring [private].   (* sent by N in hybrid sessions *)
+free secretC: bitstring [private].   (* sent by N in classical sessions *)
+
+event NodeStart(bitstring, tier).
+event NodeAccept(bitstring, bitstring, tier, key).
+event GwRespond(bitstring, bitstring, tier, key).
+event GwAccept(bitstring, bitstring, tier, key).
+
+(* ---- security queries ---- *)
+query attacker(secretH).
+query attacker(secretC).
+query attacker(secretH) phase 1.                              (* forward secrecy, hybrid *)
+query nN: bitstring, nG: bitstring, t: tier, k: key;
+      inj-event(NodeAccept(nN, nG, t, k)) ==> inj-event(GwRespond(nN, nG, t, k)).
+query nN: bitstring, nG: bitstring, t: tier, k: key;
+      inj-event(GwAccept(nN, nG, t, k)) ==> inj-event(NodeAccept(nN, nG, t, k)).
+query nN: bitstring, nG: bitstring, k: key;                     (* tier-downgrade resistance *)
+      event(GwAccept(nN, nG, CLASSICAL, k)) ==> event(NodeStart(nN, CLASSICAL)).
+query nN: bitstring, nG: bitstring, k: key;
+      event(NodeAccept(nN, nG, HYBRID, k)) ==> event(NodeStart(nN, HYBRID)).
+
+(* ---- node ---- *)
+let Node(t: tier, payload: bitstring) =
+  new nN: bitstring;
+  new x: exponent;
+  new dk: kemsk;
+  let epkN = exp(g, x) in
+  let ek = (if t = HYBRID then kempk(dk) else noek) in
+  event NodeStart(nN, t);
+  let m1 = (NID, nN, t, epkN, ek) in
+  out(c, m1);
+  in(c, (nG: bitstring, t2: tier, epkG: G, ct: bitstring, sig: bitstring, macG: bitstring));
+  if t2 = t then
+  let body = (nG, t2, epkG, ct) in
+  let ok = (if t = HYBRID then verify(sig, H((m1, body)), spk(skG)) else true) in
+  if ok = true then
+  let ss = (if t = HYBRID then kemdec(dk, ct) else nokem) in
+  let th = H((m1, body, sig)) in
+  let dh = exp(epkG, x) in
+  if macG = mac(kdf(dh, ss, psk, th, L_CONFG), th) then
+  let up = kdf(dh, ss, psk, th, L_UP) in
+  event NodeAccept(nN, nG, t, up);
+  out(c, mac(kdf(dh, ss, psk, th, L_CONFN), (th, macG)));
+  out(c, aenc(mk(up), payload, (nN, nG, t))).
+
+(* ---- gateway (floor admits both tiers) ---- *)
+let Gateway =
+  in(c, (nid: bitstring, nN: bitstring, t: tier, epkN: G, ek: kempkey));
+  if nid = NID then
+  new nG: bitstring;
+  new y: exponent;
+  new r: kseed;
+  let epkG = exp(g, y) in
+  let ct = (if t = HYBRID then kemct(ek, r) else noct) in
+  let ss = (if t = HYBRID then kemss(ek, r) else nokem) in
+  let m1 = (nid, nN, t, epkN, ek) in
+  let body = (nG, t, epkG, ct) in
+  let sig = (if t = HYBRID then sign(H((m1, body)), skG) else nosig) in
+  let th = H((m1, body, sig)) in
+  let dh = exp(epkN, y) in
+  let up = kdf(dh, ss, psk, th, L_UP) in
+  let macG = mac(kdf(dh, ss, psk, th, L_CONFG), th) in
+  event GwRespond(nN, nG, t, up);
+  out(c, (nG, t, epkG, ct, sig, macG));
+  in(c, macN: bitstring);
+  if macN = mac(kdf(dh, ss, psk, th, L_CONFN), (th, macG)) then
+  event GwAccept(nN, nG, t, up).
+
+process
+  (!Node(HYBRID, secretH)) | (!Node(CLASSICAL, secretC)) | (!Gateway)
+  | (phase 1; out(c, (psk, skG)))

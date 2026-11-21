@@ -1,0 +1,5 @@
+# torch is pinned to one version for every target; only the wheel index differs.
+#   CPU (CI, local, WP2/WP3):  pip install -r requirements-torch.txt --index-url https://download.pytorch.org/whl/cpu
+#   GPU (RunPod, WP1):        pip install -r requirements-torch.txt --index-url https://download.pytorch.org/whl/cu128
+# Install with --no-deps after requirements.lock, which already pins torch's pure-Python dependencies.
+torch==2.14.1

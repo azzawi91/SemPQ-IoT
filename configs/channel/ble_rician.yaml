@@ -1,0 +1,24 @@
+# Slot-level link model (src/channel). Values here are simulation settings, not measurements.
+avg_ebn0_db: 10.0          # swept 0-20 dB in WP1/WP2
+k_factor: 3.0              # Rician K (linear); 0 = Rayleigh. Body-area LoS assumption, swept in sensitivity runs
+block_len: 1               # slots per fading block
+ber_model: gfsk_mc         # gfsk_mc | noncoherent_fsk (see src/channel/ble_phy.py)
+gfsk_mc:
+  bt: 0.5                  # BLE GFSK bandwidth-bit period product (Core Spec Vol 6 Part A)
+  h: 0.5                   # nominal modulation index (spec range 0.45-0.55)
+  sps: 8
+  n_bits: 400000
+  ebn0_grid_db: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+  prefilter: true
+frame:                     # LE uncoded PHY packet (Core Spec Vol 6 Part B 2.1)
+  preamble_bits: 8
+  access_address_bits: 32
+  header_bits: 16
+  crc_bits: 24
+  mic_bits: 0
+  max_payload_bytes: 251   # LE Data Length Extension
+outage:                    # Gilbert-Elliott; null disables
+  mean_outage_slots: 20
+  outage_fraction: 0.05
+  e_g: 0.0
+  e_b: 1.0

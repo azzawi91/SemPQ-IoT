@@ -1,0 +1,7 @@
+# Compute budget (brief section 7; decision 2026-10-11, docs/DECISIONS.md)
+runpod:
+  project_cost_cap_usd: 50        # whole project, all runs together
+  per_run_approval_usd: 50        # any single run above this needs the client's written approval
+  estimate_margin: 1.2            # estimate = hours x price x 1.2, logged before launch
+  prefer_cpu_for: [wp2, wp3, proverif]
+  wp1_policy: cpu_first           # GPU only when a run is too slow on CPU; estimate logged first

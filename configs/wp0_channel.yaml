@@ -1,0 +1,8 @@
+defaults:
+  - channel@channel: ble_rician
+  - _self_
+seed: 0
+payloads: [27, 120, 251]   # LL payload bytes: legacy max, mid, DLE max
+hydra:
+  run:
+    dir: outputs/wp0_channel/${now:%Y-%m-%d_%H-%M-%S}

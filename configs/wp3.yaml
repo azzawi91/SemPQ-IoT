@@ -1,0 +1,36 @@
+# WP3 threat-aware Lyapunov scheduler (experiments/wp3_scheduler.py). Scenario parameters below
+# are simulation settings (not measurements); energies and accuracies come from
+# configs/constants.yaml and configs/wp3_inputs.yaml (WP1/WP2 results).
+seed: 0
+seeds: [0, 1, 2, 3, 4]
+slots: 20000                 # beats per run
+slot_s: 1.0                  # one beat decision per second (nominal)
+powers_dbm: [-4.0, 0.0, 4.0, 8.0]
+gamma0_db: 12.0              # average Eb/N0 at the gateway for 0 dBm (link-budget scenario; swept)
+k_factor: 3.0
+block_len: 1
+outage: {mean_slots: 5, fraction: 0.05}
+threat:
+  P: [[0.9995, 0.0004, 0.0001],   # synthetic threat-level Markov chain (no threat data exists);
+      [0.0010, 0.9985, 0.0005],   # mean dwell times 2000 / 667 / 500 slots
+      [0.0005, 0.0015, 0.9980]]
+floor: {0: 0, 1: 1, 2: 2}    # s_min(theta) (decision 2026-10-11)
+rekey_every: 100             # tier 2: KEM re-key every 100 records
+V: 100.0
+E_bar_extra: 3.0e-5          # energy budget per slot above the encoder inference energy (J); E_bar = E_enc + E_bar_extra
+include_encoder_energy: true # decision 2026-10-12 (review 1): node energy includes the INT8 encoder
+cycles_per_mac: cycles_per_mac   # constants.yaml nn_inference key (sensitivity: cycles_per_mac_pessimistic)
+inputs_path: configs/wp3_inputs.yaml
+D_bar: 0.15                  # average delay-proxy budget per slot (s); minimum achievable at 12 dB is 0.116
+fixed_rate_level: k4_b8
+threshold_gain_db: 0.0
+level_names: [k1_b4, k1_b8, k2_b8, k4_b8, k8_b8, k16_b8]
+v_sweep: [1, 3, 10, 30, 100, 300, 1000, 3000, 10000]
+gamma0_sweep: [8.0, 12.0, 16.0]
+ber:
+  seed: 0
+  n_bits: 400000
+  ebn0_grid_db: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+hydra:
+  run:
+    dir: outputs/hydra/wp3/${now:%Y-%m-%d_%H-%M-%S}

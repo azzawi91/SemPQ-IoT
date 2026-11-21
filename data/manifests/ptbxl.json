@@ -1,0 +1,16 @@
+{
+  "database": "ptb-xl",
+  "version": "1.0.3",
+  "source": "s3",
+  "url": "s3://physionet-open/ptb-xl/1.0.3/",
+  "archive_sha256": null,
+  "files_listed": 87203,
+  "files_checked": 43605,
+  "files_excluded": 43598,
+  "excluded_prefixes": [
+    "records500/"
+  ],
+  "missing": [],
+  "mismatched": [],
+  "sha256sums_txt": "b7224b92b341511ec3ceb13dc6652079b2c36a06504bcb49506f157f51dc695d"
+}

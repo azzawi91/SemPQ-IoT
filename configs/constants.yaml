@@ -1,0 +1,72 @@
+# External constants used by the cost model (brief rule 5).
+# Every entry carries value, unit and a pinned citation (repository commit, or document name +
+# version + table/section). Nothing is filled in from memory; null = not yet sourced.
+# The on-device cost derived from these values is a MODEL built from published measurements on
+# Cortex-M4 parts, not a measurement on the nRF52840.
+
+pqm4:
+  commit: 5e5cc76d0b072ee7077e58afcbc619a1a67a53b4   # github.com/mupq/pqm4, benchmarks.md
+  platform: "NUCLEO-L4R5ZI (Cortex-M4F), cycle counts obtained at 24 MHz to avoid flash wait states (pqm4 README)"
+  cycles:
+    ml_kem_512_keygen: {value: 392423, unit: cycles, citation: "pqm4 @5e5cc76 benchmarks.md, Speed Evaluation / KEM, ml-kem-512 m4fspeed, key generation AVG (10 executions)"}
+    ml_kem_512_encaps: {value: 390881, unit: cycles, citation: "pqm4 @5e5cc76 benchmarks.md, Speed Evaluation / KEM, ml-kem-512 m4fspeed, encapsulation AVG"}
+    ml_kem_512_decaps: {value: 428167, unit: cycles, citation: "pqm4 @5e5cc76 benchmarks.md, Speed Evaluation / KEM, ml-kem-512 m4fspeed, decapsulation AVG"}
+    ml_dsa_44_keygen:  {value: 1426025, unit: cycles, citation: "pqm4 @5e5cc76 benchmarks.md, Speed Evaluation / Signatures, ml-dsa-44 m4f, key generation AVG (1000 executions)"}
+    ml_dsa_44_sign:    {value: 3943121, unit: cycles, citation: "pqm4 @5e5cc76 benchmarks.md, Speed Evaluation / Signatures, ml-dsa-44 m4f, sign AVG (1000 executions; MAX 17,009,165)"}
+    ml_dsa_44_verify:  {value: 1421623, unit: cycles, citation: "pqm4 @5e5cc76 benchmarks.md, Speed Evaluation / Signatures, ml-dsa-44 m4f, verify AVG (1000 executions)"}
+    x25519:            {value: 907240, unit: cycles, citation: "Fujii and Aranha, 'Curve25519 for the Cortex-M4 and beyond', Table 2, X25519, this work, constant time, Cortex-M4 (Teensy 3.2, MK20DX256VLH7 at 72 MHz), average of 256 executions; DOI to be verified in WP5; evidence: docs/sources/fujii_aranha_2017.md"}
+    aes128_block:      {value: 2000.0, unit: cycles/16-byte block, citation: "Oryx Embedded, 'Crypto Benchmark on STM32L4+ MCU' (oryx-embedded.com/benchmark/st/crypto-stm32l4-plus.html; page SHA256 1a0835560f56d6e1ba04d8f8f6b5e3a3ddfd32bdeabb42694ab2a541909a0b1c, fetched 2026-10-11), STM32L4S5 Cortex-M4 at 120 MHz, CycloneCRYPTO 2.5.0, ARMCC -O3, software; AES128-CTR encryption 0.96 MB/s -> 120e6/0.96e6 = 125.0 cycles/byte x 16 (MB taken as 1e6 bytes)"}
+    aes128_block_optimized: {value: 844, unit: cycles/16-byte block, citation: "github.com/jnk0le/cortexm-AES @67ffb066a7446437936facd9b8150ca65a879d8b, doc/aes/CM3_CM4_details.md, encrypt<128>, STM32F4 - CM4_DSPsBOX (constant time); sensitivity only"}
+    aes128_keyschedule: {value: 302, unit: cycles, citation: "same file, setEncKey<128>, STM32F4 - CM4_DSPsBOX"}
+    ghash_per_block:   {value: 1650.2, unit: cycles/16-byte block, citation: "Oryx Embedded, 'Crypto Benchmark on STM32L4+ MCU' (oryx-embedded.com/benchmark/st/crypto-stm32l4-plus.html; page SHA256 1a0835560f56d6e1ba04d8f8f6b5e3a3ddfd32bdeabb42694ab2a541909a0b1c, fetched 2026-10-11), STM32L4S5 Cortex-M4 at 120 MHz, CycloneCRYPTO 2.5.0, ARMCC -O3, software; derived: AES128-GCM 0.526 MB/s (228.14 cycles/byte) minus AES128-CTR 0.96 MB/s (125.00 cycles/byte) = 103.14 cycles/byte x 16"}
+    sha256_compression: {value: 5082.7, unit: cycles/64-byte block, citation: "Oryx Embedded, 'Crypto Benchmark on STM32L4+ MCU' (oryx-embedded.com/benchmark/st/crypto-stm32l4-plus.html; page SHA256 1a0835560f56d6e1ba04d8f8f6b5e3a3ddfd32bdeabb42694ab2a541909a0b1c, fetched 2026-10-11), STM32L4S5 Cortex-M4 at 120 MHz, CycloneCRYPTO 2.5.0, ARMCC -O3, software; SHA-256 1.511 MB/s -> 120e6/1.511e6 = 79.42 cycles/byte x 64"}
+nn_inference:
+  # INT8 CNN inference throughput on Cortex-M4F, whole-network figures (the only sourced values;
+  # kernel-level peaks are not used). cycles/MAC = time x clock / MACs.
+  cycles_per_mac:
+    value: 1.88
+    unit: cycles/MAC
+    citation: "Ingolfsson et al., ECG-TCN, IEEE AICAS 2021 (DOI 10.1109/AICAS51828.2021.9458520), Table II, column CNN+GRU [5]: nRF52832 Cortex-M4F @64 MHz, CMSIS-NN, 3,221,244 MACs, 94.8 ms -> 94.8e-3 x 64e6 / 3,221,244 = 1.88"
+  cycles_per_mac_pessimistic:
+    value: 6.43
+    unit: cycles/MAC
+    citation: "same table, column TCN TFLite: STM32L475 Cortex-M4F @80 MHz, TFLite Micro with CMSIS-NN kernels, INT-8, 2,339,994 MACs, 188.0 ms -> 188.0e-3 x 80e6 / 2,339,994 = 6.43 (sensitivity)"
+mcu:
+  part: "Nordic nRF52840 (Cortex-M4F, BLE 5 radio)"
+  clock_mhz: {value: 64, citation: "nRF52840 Product Specification v1.1 (4413_417, 2019-02-28), section 5.2.1.3, CPU running CoreMark @64 MHz"}
+  run_current_ma: {value: 3.3, citation: "nRF52840 PS v1.1, section 5.2.1.3, ICPU0: CPU running CoreMark @64 MHz from flash, Clock = HFXO, Regulator = DC/DC, typ."}
+  supply_v: {value: 3.0, citation: "nRF52840 PS v1.1, Table 13 (current consumption scenarios, common conditions): Supply 3 V on VDD/VDDH"}
+radio_ble:
+  tx_current_ma: {value: 6.40, citation: "nRF52840 PS v1.1, section 5.2.1.5, IRADIO_TX1: radio transmitting @ 0 dBm, 1 Mbps BLE mode, Clock = HFXO, Regulator = DC/DC, typ."}
+  rx_current_ma: {value: 6.26, citation: "nRF52840 PS v1.1, section 5.2.1.5, IRADIO_RX0: radio receiving @ 1 Mbps BLE mode, Clock = HFXO, Regulator = DC/DC, typ."}
+  phy_rate_mbps: {value: 1, citation: "BLE LE 1M PHY"}
+  # radio-only TX run current per output power (DC/DC, 3 V): nRF52840 PS v1.1, section 6.20.15.2
+  tx_radio_only_ma:
+    "+8": {value: 14.8, citation: "nRF52840 PS v1.1, 6.20.15.2, ITX,PLUS8dBM,DCDC"}
+    "+4": {value: 9.6, citation: "nRF52840 PS v1.1, 6.20.15.2, ITX,PLUS4dBM,DCDC"}
+    "0": {value: 4.8, citation: "nRF52840 PS v1.1, 6.20.15.2, ITX,0dBM,DCDC"}
+    "-4": {value: 3.1, citation: "nRF52840 PS v1.1, 6.20.15.2, ITX,MINUS4dBM,DCDC"}
+    "-8": {value: 3.3, citation: "nRF52840 PS v1.1, 6.20.15.2, ITX,MINUS8dBM,DCDC (typ. as printed)"}
+  # system overhead while transmitting (HFXO, regulators): system-level IRADIO_TX1 (0 dBm, 6.40 mA,
+  # section 5.2.1.5) minus radio-only ITX,0dBM,DCDC (4.8 mA) = 1.6 mA. Check: +8 dBm radio-only 14.8
+  # + 1.6 = 16.4 mA equals the system-level IRADIO_TX0 (16.40 mA). Derived, not a datasheet entry.
+  tx_system_overhead_ma: {value: 1.6, citation: "derived: nRF52840 PS v1.1 5.2.1.5 IRADIO_TX1 (6.40) - 6.20.15.2 ITX,0dBM,DCDC (4.8); verified at +8 dBm (16.40 = 14.8 + 1.6)"}
+# BLE connection event and sleep floor (decision 2026-10-13, external review point 6). Values read from the full
+# text of the same datasheet file (sha256 below), r/sources-full:sources/nrf52840_ps_v1_1_full.txt; printed page numbers.
+ble_connection:
+  t_rxen_us: {value: 140, citation: "nRF52840 PS v1.1, 6.20.15.8 Radio timing (p. 358), tRXEN,BLE,1M, typ."}
+  t_txen_us: {value: 140, citation: "nRF52840 PS v1.1, 6.20.15.8 Radio timing (p. 358), tTXEN,BLE,1M (1 Mbps BLE, 150 us TIFS), typ."}
+  t_rxen_fast_us: {value: 40, citation: "nRF52840 PS v1.1, 6.20.15.8 (p. 358), tRXEN,FAST,BLE,1M (sensitivity)"}
+  t_txen_fast_us: {value: 40, citation: "nRF52840 PS v1.1, 6.20.15.8 (p. 358), tTXEN,FAST,BLE,1M (sensitivity)"}
+  t_ifs_us: {value: 150, citation: "Bluetooth LE inter-frame space; nRF52840 PS v1.1, 6.20.15.8 (p. 358) states 150 us TIFS for tTXEN,BLE,1M"}
+  i_start_rx_ma: {value: 3.7, citation: "nRF52840 PS v1.1, 6.20.15.3 (p. 354), ISTART,RX,1M,DCDC (3 V)"}
+  i_start_tx_ma: {value: 5.2, citation: "nRF52840 PS v1.1, 6.20.15.2 (p. 354), ISTART,TX,DCDC (3 V, PRF = 4 dBm; used for every power)"}
+  t_hfxo_power_us: {value: 50, citation: "nRF52840 PS v1.1, 5.4.4.2 (p. 97), tPOWER_X32M_X0, Epson TSX-3225"}
+  t_hfxo_debounce_us: {value: 256, citation: "nRF52840 PS v1.1, 5.4.3.22 HFXODEBOUNCE (p. 95), Db256us, recommended for TSX-3225"}
+  i_hfxo_start_ua: {value: 328, citation: "nRF52840 PS v1.1, 5.4.4.2 (p. 96), ISTART_X32M_X0, average start-up current first 1 ms, Epson TSX-3225"}
+  t_hfxo_power_pess_us: {value: 210, citation: "nRF52840 PS v1.1, 5.4.4.2 (p. 97), tPOWER_X32M_X4, NDK NX1210AB (sensitivity)"}
+  t_hfxo_debounce_pess_us: {value: 1024, citation: "nRF52840 PS v1.1, 5.4.3.22 (p. 95), Db1024us, recommended for NX1210AB (sensitivity)"}
+  i_hfxo_start_pess_ua: {value: 833, citation: "nRF52840 PS v1.1, 5.4.4.2 (p. 97), ISTART_X32M_X4, NDK NX1210AB (sensitivity)"}
+  i_sleep_ua: {value: 3.16, citation: "nRF52840 PS v1.1, 5.2.1.1 Sleep (p. 56), ION_RAMON_RTC: System ON, full RAM retention, wake on RTC (LFRC)"}
+source_document_hashes:
+  nrf52840_ps_v1_1_sha256: c619e336b9c0610663273041f057f2537a65fd408ce0c5b8214a26de2aa88422   # r/sources:sources/MANIFEST.json

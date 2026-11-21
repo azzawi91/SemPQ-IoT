@@ -1,0 +1,44 @@
+# WP1 entry point: semantic codec on MIT-BIH inter-patient (decisions: docs/DECISIONS.md)
+defaults:
+  - data@data: mitbih
+  - model@model: semantic
+  - train@train: wp1
+  - _self_
+paths:
+  raw: ${oc.env:SEMPQ_DATA_RAW,data/raw}
+  cache: ${oc.env:SEMPQ_DATA_CACHE,data/cache}
+  out: ${oc.env:SEMPQ_OUT,outputs/wp1}
+  results: results/wp1
+  dev_results: results/wp1_dev
+method: semantic          # semantic | raw | dwt | jscc | label | rr_only
+run_name: ${method}_mitbih
+baselines:
+  raw_sample_bits: 11      # MIT-BIH digitisation resolution
+  dwt_coeff_levels: [8, 16, 32, 64]
+seed: 0
+classes: [N, S, V, F]
+features:                 # device-side causal features (label-free); 0 disables
+  template_alpha: 0.0      # EMA template of past beats -> extra input channel x - template
+  rr_long_window: 0        # mean of the last N pre-RR intervals, sent as one more RR byte
+rr:
+  step_s: 0.01           # 8-bit RR features, 0-2.55 s
+  bytes: 3               # pre, post, local RR transmitted with every beat
+eval:
+  snr_grid_db: [0.0, 5.0, 10.0, 15.0, 20.0]
+  loss_grid: [0.1, 0.2, 0.3, 0.4]
+  sensitivity_exclude_test: [202]   # decision 2026-10-11: extra row without record 202
+threads: 1
+final:                    # protocol of the reported (DS2) runs
+  train_on: ds1_train       # ds1_train (17 records, early stopping on val) | ds1_all (22 records)
+  fixed_epochs: 0           # >0: train exactly this many epochs and evaluate the last one
+dev:                      # validation-only development (decision 2026-10-11); DS2 never loaded
+  enabled: false
+  variant: none
+  cv_folds: 0              # >0: patient-level CV over DS1 records (out-of-fold, fixed epochs)
+  cv_epochs: 15
+int8:
+  enabled: true
+  calib_beats: 4096       # first beats of the training split
+hydra:
+  run:
+    dir: outputs/hydra/wp1/${run_name}/seed${seed}

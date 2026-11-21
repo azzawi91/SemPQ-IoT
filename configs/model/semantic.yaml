@@ -1,0 +1,14 @@
+# L1 semantic codec (src/l1_semantic/model.py)
+name: semantic
+latent_channels: 16
+clip: 4.0
+variational: true
+encoder: null           # optional {widths, kernels, strides} of the on-node encoder; null = (16,24,32,32,32), (7,5,5,3,3), stride 2
+recon_weight: 0.0       # >0 adds a gateway decoder and an MSE reconstruction term (hybrid)
+rate_levels:            # nested levels: first `channels` latent channels, `bits` per element
+  - {channels: 1, bits: 4}
+  - {channels: 1, bits: 8}
+  - {channels: 2, bits: 8}
+  - {channels: 4, bits: 8}
+  - {channels: 8, bits: 8}
+  - {channels: 16, bits: 8}

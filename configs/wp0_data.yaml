@@ -1,0 +1,17 @@
+# WP0 data entry point: download + verify, build/verify split files, data statistics table.
+defaults:
+  - data@mitbih: mitbih
+  - data@ptbxl: ptbxl
+  - _self_
+paths:
+  raw: ${oc.env:SEMPQ_DATA_RAW,data/raw}
+  cache: ${oc.env:SEMPQ_DATA_CACHE,data/cache}
+  manifests: data/manifests
+  results: results/wp0
+  tables: tables
+mode: auto                   # auto: write split files if absent, else rebuild and require identical hashes; build: overwrite
+source: archive              # archive (physionet.org zip) | s3 (PhysioNet AWS open-data mirror, 100 Hz only)
+seed: 0                      # no randomness is used in WP0 data code; recorded for provenance
+hydra:
+  run:
+    dir: outputs/wp0_data/${now:%Y-%m-%d_%H-%M-%S}

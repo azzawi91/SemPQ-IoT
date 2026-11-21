@@ -1,0 +1,25 @@
+# WP1 configuration B (decisions 2026-10-11, docs/DECISIONS.md), selected by DS1 patient CV
+# (development rounds 2-3). Shared by every method: causal EMA template + long-term RR byte,
+# training augmentation, training on all 22 DS1 records for 15 fixed epochs.
+defaults:
+  - wp1_mitbih
+  - _self_
+features:
+  template_alpha: 0.05
+  rr_long_window: 100
+train:
+  augment:
+    enabled: true
+model:
+  recon_weight: 0.3          # used by the proposed encoder only
+  encoder:                   # decision 2026-10-13: w4, chosen by DS1 CV (r/wp1-encsize-3fb6bf9)
+    widths: [4, 8, 8, 8, 8]
+    kernels: [7, 5, 5, 3, 3]
+    strides: [2, 2, 2, 2, 2]
+final:
+  train_on: ds1_all
+  fixed_epochs: 15
+ablations:                   # proposed-encoder ablations on DS2 (method alias -> overrides)
+  semantic_norec: {base: semantic, overrides: {model.recon_weight: 0.0}}
+  semantic_noaug: {base: semantic, overrides: {train.augment.enabled: false}}
+  semantic_notpl: {base: semantic, overrides: {features.template_alpha: 0.0}}

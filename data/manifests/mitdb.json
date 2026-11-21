@@ -1,0 +1,14 @@
+{
+  "database": "mitdb",
+  "version": "1.0.0",
+  "source": "s3",
+  "url": "s3://physionet-open/mitdb/1.0.0/",
+  "archive_sha256": null,
+  "files_listed": 704,
+  "files_checked": 704,
+  "files_excluded": 0,
+  "excluded_prefixes": [],
+  "missing": [],
+  "mismatched": [],
+  "sha256sums_txt": "b61158a96d5f2ca80edfb354a9a66a6324836c390a84e1966dcee2b907d6be43"
+}
