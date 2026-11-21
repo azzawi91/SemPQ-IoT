@@ -50,7 +50,7 @@ def req(method: str, url: str, token: str, data=None, headers=None):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--repo", default="yazanjer/paper-sempq-iotj-mustafaazzawi")
+    ap.add_argument("--repo", default="azzawi91/SemPQ-IoT")
     ap.add_argument("--release-branch", required=True)
     ap.add_argument("--dry-run", action="store_true", help="build the zip and metadata only")
     a = ap.parse_args()
