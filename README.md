@@ -3,7 +3,7 @@ SemPQ-IoT: Semantic Encoding, Post-Quantum Security and Lyapunov Scheduling for 
 Code accompanying the article by M. A. Azzawi, H. M. Al-Juboori, R. Hassan, M. F. Nasrudin
 and A. A. Abdulhussein.
 
-![SemPQ-IoT: Semantic Encoding, Post-Quantum Security and Lyapunov Scheduling for Wearable ECG](https://azzawi91.github.io/assets/research/sempq-iot.gif)
+![SemPQ-IoT: Semantic Encoding](sempq-iot.gif)
 
 This repository holds the simulation code of the three layers of the article and the script
 that regenerates every table and figure:
