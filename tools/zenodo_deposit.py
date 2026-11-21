@@ -5,7 +5,7 @@
 Runs on a short-lived pod (decision 2026-10-11): clones the results branch, zips
 results/wp1/<run>_mitbih/seed*_model.pt with their seed*.json metrics and the release metadata,
 creates a draft deposition, uploads the zip, and writes the draft id and link to branch
-r/zenodo. It never publishes; Dr. Yazan reviews and presses Publish.
+r/zenodo. It never publishes; Mr. Azzawi reviews and presses Publish.
 The token is read from the environment only and is never printed or written to disk.
 """
 from __future__ import annotations
